@@ -33,9 +33,10 @@ const COL = {
 
 /**
  * doGet melayani 2 mod:
- * 1. Tanpa parameter -> serve halaman web (Index.html) seperti biasa.
- * 2. ?action=semak&ic=xxxxx -> return JSON hasil semakan (untuk dipanggil
- *    melalui fetch() dari luar, contoh: GitHub Pages PWA).
+ * 1. ?action=semak&ic=xxxxx -> return JSON hasil semakan (dipanggil melalui
+ *    fetch() dari GitHub Pages PWA - stpuitu.github.io/tempah).
+ * 2. Tanpa parameter -> redirect ke GitHub Pages PWA (UI utama sistem ini
+ *    sekarang dihoskan di sana, /exec hanya berfungsi sebagai API).
  */
 function doGet(e) {
   const action = e && e.parameter && e.parameter.action;
@@ -48,11 +49,10 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JSON);
   }
 
-  return HtmlService.createTemplateFromFile('Index')
-      .evaluate()
-      .setTitle('S.T.P.U - Sistem Tempahan Produk Unggas')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  return HtmlService.createHtmlOutput(
+      '<script>window.top.location.href="https://stpuitu.github.io/tempah/";</script>' +
+      '<p>Mengalihkan ke <a href="https://stpuitu.github.io/tempah/">https://stpuitu.github.io/tempah/</a>...</p>'
+  );
 }
 
 /**
