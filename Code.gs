@@ -7,13 +7,15 @@
  */
 
 // Konfigurasi semua spreadsheet produk
+// statusCol/slipCol ialah nombor lajur 1-based (A=1, B=2, ...) mengikut
+// lajur "STATUS TEMPAHAN" dan "Merged Doc URL - SLIP TEMPAHAN ..." pada setiap sheet.
 const SPREADSHEETS = [
-  { id: "131xIA9dGUmNc6CrWN-4R7N6t4f-bZQ9jSwx0pdzjMHg", statusCol: 13, slipCol: 15 }, // TELUR_BERNAS_AK        (L=12, O=15)
-  { id: "1kl6M-eDIJ7lHvX84sijOYdgJKbk4OLhW4Sk5eseLoz0", statusCol: 13, slipCol: 15 }, // ANAK_AYAM_AK           (M=13, P=15)
-  { id: "1v6nnt-6wFp4ha_QfjORBQ5Gh6gOg0p0VxKc-FSbG5qI", statusCol: 12, slipCol: 14 }, // TELUR_PUYUH_PEDAGING   (L=13, O=15)
-  { id: "1HbXJUqBOyu-dUixgaPNlFfZhPqLibq_AeVju2JfbYfU", statusCol: 12, slipCol: 14 }, // ANAK_PUYUH_PEDAGING    (M=12, P=14)
-  { id: "1mmB7bVyPvAE4SPSoQp5EiSQUGxa9XgbMg63U90lexHA", statusCol: 12, slipCol: 14 }, // TELUR_PUYUH_PENELUR    (L=12, O=14)
-  { id: "1eiHYWxtkdOrf9FU_vvutbESskAY9klFtWtKpsFYbM_s", statusCol: 12, slipCol: 15 }, // ANAK_PUYUH_PENELUR     (M=12, P=15)
+  { id: "131xIA9dGUmNc6CrWN-4R7N6t4f-bZQ9jSwx0pdzjMHg", statusCol: 13, slipCol: 15 }, // TELUR_BERNAS_AK       -> Status=M(13), Slip URL=O(15)
+  { id: "1kl6M-eDIJ7lHvX84sijOYdgJKbk4OLhW4Sk5eseLoz0", statusCol: 13, slipCol: 15 }, // ANAK_AYAM_AK          -> Status=M(13), Slip URL=O(15)
+  { id: "1v6nnt-6wFp4ha_QfjORBQ5Gh6gOg0p0VxKc-FSbG5qI", statusCol: 12, slipCol: 14 }, // TELUR_PUYUH_PEDAGING  -> Status=L(12), Slip URL=N(14)
+  { id: "1HbXJUqBOyu-dUixgaPNlFfZhPqLibq_AeVju2JfbYfU", statusCol: 12, slipCol: 14 }, // ANAK_PUYUH_PEDAGING   -> Status=L(12), Slip URL=N(14)
+  { id: "1mmB7bVyPvAE4SPSoQp5EiSQUGxa9XgbMg63U90lexHA", statusCol: 12, slipCol: 14 }, // TELUR_PUYUH_PENELUR   -> Status=L(12), Slip URL=N(14)
+  { id: "1eiHYWxtkdOrf9FU_vvutbESskAY9klFtWtKpsFYbM_s", statusCol: 12, slipCol: 15 }, // ANAK_PUYUH_PENELUR    -> Status=L(12), Slip URL=O(15)
 ];
 
 // Indeks kolum (0-based)
