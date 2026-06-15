@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>S.T.P.U - Sistem Tempahan Produk Unggas</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green-dark:  #1b5e20;
+      --green-mid:   #2e7d32;
+      --green-light: #43a047;
+      --green-bg:    #e8f5e9;
+      --gold-bg:     #fff8e1;
+      --bg:          #eef2ee;
+      --text-dark:   #1a2e1a;
+      --text-mid:    #3d5c3d;
+      --text-muted:  #6b8a6b;
+      --red:         #b71c1c;
+      --wa-green:    #25d366;
+      --card-shadow: 0 4px 20px rgba(27,94,32,.10);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 20px 16px 52px;
+    }
+
+    .header {
+      text-align: center;
+      background: white;
+      padding: 24px 20px 20px;
+      border-radius: 18px;
+      box-shadow: var(--card-shadow);
+      margin: 0 auto 20px;
+      max-width: 1140px;
+      border-top: 5px solid var(--green-mid);
+    }
+    .logo-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .logo-box img {
+      height: 54px;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+    .header h1 {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--green-dark);
+      letter-spacing: .3px;
+      margin-bottom: 4px;
+    }
+    .header h2 {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .notice {
+      max-width: 1140px;
+      margin: 0 auto 16px;
+      background: #fff3e0;
+      border: 1.5px solid #ffcc80;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-size: 11.5px;
+      color: #5d4037;
+      line-height: 1.65;
+      text-align: center;
+    }
+    .notice strong { color: var(--red); }
+
+    .info-bar {
+      max-width: 1140px;
+      margin: 0 auto 22px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .info-tile {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      border: 1.5px solid #e0ece0;
+    }
+    .tile-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .tile-icon.green { background: var(--green-bg); color: var(--green-mid); }
+    .tile-icon.gold  { background: var(--gold-bg);  color: #e65100; }
+    .tile-icon.wa    { background: #e8f5e9; color: var(--wa-green); }
+    .tile-icon.map   { background: #fce4ec; color: #c62828; }
+    .tile-body { flex: 1; }
+    .tile-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .6px;
+      color: var(--text-muted); margin-bottom: 3px;
+    }
+    .tile-value {
+      font-size: 12.5px; font-weight: 600;
+      color: var(--text-dark); line-height: 1.55;
+    }
+    .tile-value a { color: var(--green-mid); text-decoration: none; font-weight: 700; }
+    .tile-value a:hover { text-decoration: underline; }
+
+    .section-title {
+      max-width: 1140px;
+      margin: 0 auto 14px;
+      font-size: 13px; font-weight: 700;
+      color: var(--text-mid);
+      text-transform: uppercase; letter-spacing: .8px;
+      padding-left: 4px;
+    }
+
+    .nav-bar {
+      max-width: 1140px;
+      margin: 0 auto 22px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .btn-nav {
+      background: var(--green-mid);
+      color: white;
+      border: 2px solid var(--green-mid);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s;
+      font-family: inherit;
+    }
+    .btn-nav:hover { background: var(--green-dark); border-color: var(--green-dark); }
+    .btn-nav.btn-nav-outline {
+      background: white;
+      color: var(--green-dark);
+    }
+    .btn-nav.btn-nav-outline:hover {
+      background: var(--green-mid);
+      color: white;
+    }
+    .btn-nav.active {
+      background: var(--green-dark);
+      border-color: var(--green-dark);
+      color: white;
+    }
+    .btn-nav.btn-maklum {
+      background: white;
+      color: #6a1b9a;
+      border-color: #ce93d8;
+    }
+    .btn-nav.btn-maklum:hover, .btn-nav.btn-maklum.active {
+      background: #6a1b9a;
+      color: white;
+      border-color: #6a1b9a;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      border: 1.5px solid #ddeadd;
+      box-shadow: var(--card-shadow);
+      cursor: pointer;
+      transition: transform .22s, box-shadow .22s, border-color .22s;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: var(--green-light);
+      box-shadow: 0 12px 32px rgba(46,125,50,.16);
+    }
+    .card-top {
+      padding: 20px 20px 16px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .icon-circle {
+      background: var(--green-bg);
+      width: 50px; height: 50px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--green-mid); font-size: 20px; flex-shrink: 0;
+      transition: background .2s, color .2s;
+    }
+    .card:hover .icon-circle { background: var(--green-mid); color: white; }
+    .card-title-wrap { flex: 1; }
+    .card-category {
+      font-size: 10.5px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 3px;
+    }
+    .card h3 {
+      font-size: 13.5px; font-weight: 800;
+      color: var(--text-dark); line-height: 1.45;
+    }
+    .card-info-strip {
+      display: flex;
+      border-top: 1.5px solid #edf5ed;
+      border-bottom: 1.5px solid #edf5ed;
+    }
+    .strip-item {
+      flex: 1; padding: 10px 14px;
+      display: flex; flex-direction: column; gap: 1px;
+    }
+    .strip-item:first-child { border-right: 1.5px solid #edf5ed; }
+    .strip-label {
+      font-size: 9.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px;
+      color: var(--text-muted);
+    }
+    .strip-value { font-size: 15px; font-weight: 800; color: var(--green-dark); }
+    .strip-unit  { font-size: 10px; font-weight: 500; color: var(--text-muted); }
+    .card-bottom { padding: 12px 16px 16px; margin-top: auto; }
+    .btn-action {
+      background: var(--green-mid); color: white;
+      padding: 11px 16px; border-radius: 10px;
+      font-weight: 700; font-size: 12.5px;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: background .2s; width: 100%;
+      border: none; cursor: pointer;
+    }
+    .card:hover .btn-action { background: var(--green-dark); }
+
+    .maklum-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+    .maklum-card {
+      background: white;
+      border-radius: 16px;
+      border: 1.5px solid #e1bee7;
+      box-shadow: 0 4px 20px rgba(106,27,154,.08);
+      cursor: pointer;
+      transition: transform .22s, box-shadow .22s, border-color .22s;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      text-decoration: none;
+    }
+    .maklum-card:hover {
+      transform: translateY(-5px);
+      border-color: #9c27b0;
+      box-shadow: 0 12px 32px rgba(106,27,154,.16);
+    }
+    .maklum-card-top {
+      padding: 22px 20px 16px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .maklum-icon {
+      background: #f3e5f5;
+      width: 50px; height: 50px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #7b1fa2; font-size: 20px; flex-shrink: 0;
+      transition: background .2s, color .2s;
+    }
+    .maklum-card:hover .maklum-icon { background: #7b1fa2; color: white; }
+    .maklum-title-wrap { flex: 1; }
+    .maklum-category {
+      font-size: 10.5px; font-weight: 600;
+      color: #9c27b0;
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 3px;
+    }
+    .maklum-card h3 {
+      font-size: 13.5px; font-weight: 800;
+      color: var(--text-dark); line-height: 1.45;
+    }
+    .maklum-card-desc {
+      padding: 0 20px 18px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+    .maklum-card-bottom { padding: 0 16px 16px; }
+    .btn-maklum-action {
+      background: #7b1fa2; color: white;
+      padding: 11px 16px; border-radius: 10px;
+      font-weight: 700; font-size: 12.5px;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: background .2s; width: 100%;
+    }
+    .maklum-card:hover .btn-maklum-action { background: #4a148c; }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 200;
+      align-items: center; justify-content: center;
+      padding: 16px; backdrop-filter: blur(3px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 18px;
+      padding: 28px 24px 24px; max-width: 420px; width: 100%;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,.22);
+      animation: pop .2s ease;
+    }
+    @keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal .big-icon { font-size: 38px; margin-bottom: 10px; }
+    .modal h3 { font-size: 16px; font-weight: 800; color: var(--green-dark); margin-bottom: 7px; }
+    .modal p  { font-size: 12.5px; color: #666; margin-bottom: 14px; line-height: 1.6; }
+    .modal-product {
+      background: var(--green-bg); border-radius: 10px;
+      padding: 10px 14px; font-size: 13.5px; font-weight: 800;
+      color: var(--green-dark); margin-bottom: 10px;
+    }
+    .modal-meta { display: flex; gap: 8px; margin-bottom: 16px; }
+    .modal-meta-item {
+      flex: 1; background: #f7faf7;
+      border: 1.5px solid #d8e8d8; border-radius: 8px;
+      padding: 8px 10px; font-size: 11.5px;
+    }
+    .mm-label { color: var(--text-muted); font-weight: 600; margin-bottom: 2px; font-size: 10px; text-transform: uppercase; }
+    .mm-val   { color: var(--green-dark); font-weight: 800; font-size: 13px; }
+    .email-note {
+      background: #e3f2fd; border-radius: 8px;
+      padding: 9px 12px; font-size: 11.5px; color: #1565c0;
+      margin-bottom: 16px;
+      display: flex; align-items: flex-start; gap: 8px; text-align: left;
+    }
+    .modal-btns { display: flex; gap: 10px; }
+    .btn-confirm {
+      flex: 1; padding: 12px;
+      background: var(--green-mid); color: white;
+      border: none; border-radius: 10px;
+      font-weight: 700; font-size: 13px; cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-confirm:hover { background: var(--green-dark); }
+    .btn-cancel {
+      flex: 1; padding: 12px;
+      background: #f3f4f6; color: #374151;
+      border: none; border-radius: 10px;
+      font-weight: 600; font-size: 13px; cursor: pointer;
+    }
+    .btn-cancel:hover { background: #e5e7eb; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .semakan-wrap { max-width: 700px; margin: 0 auto; }
+    .page-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .btn-back {
+      background: white; border: 1.5px solid #ddeadd;
+      color: var(--text-mid); padding: 8px 14px;
+      border-radius: 8px; font-weight: 600; font-size: 12px;
+      cursor: pointer; display: inline-flex; align-items: center;
+      gap: 6px; transition: all .2s; font-family: inherit;
+    }
+    .btn-back:hover { border-color: var(--green-mid); color: var(--green-dark); }
+    .page-heading { font-size: 16px; font-weight: 800; color: var(--green-dark); }
+
+    .semakan-form-card {
+      background: white; border-radius: 16px;
+      padding: 24px; box-shadow: var(--card-shadow);
+      border: 1.5px solid #ddeadd; margin-bottom: 20px;
+    }
+    .semakan-form-card p {
+      font-size: 13px; color: var(--text-mid);
+      margin-bottom: 16px; line-height: 1.6;
+    }
+    .input-row { display: flex; gap: 10px; }
+    .input-ic {
+      flex: 1; padding: 12px 14px;
+      border: 1.5px solid #d0e4d0; border-radius: 10px;
+      font-size: 14px; font-family: inherit; color: var(--text-dark);
+      outline: none; transition: border-color .2s;
+    }
+    .input-ic:focus { border-color: var(--green-mid); }
+    .input-ic::placeholder { color: #aaa; }
+    .btn-cari {
+      background: var(--green-mid); color: white;
+      border: none; padding: 12px 22px; border-radius: 10px;
+      font-weight: 700; font-size: 13px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 7px;
+      transition: background .2s; white-space: nowrap; font-family: inherit;
+    }
+    .btn-cari:hover { background: var(--green-dark); }
+    .btn-cari:disabled { background: #a5c8a5; cursor: not-allowed; }
+
+    .result-empty {
+      text-align: center; padding: 32px 20px;
+      background: white; border-radius: 16px;
+      border: 1.5px solid #ddeadd; color: var(--text-muted); font-size: 13px;
+    }
+    .result-empty .big { font-size: 36px; margin-bottom: 10px; }
+    .result-card {
+      background: white; border-radius: 14px;
+      border: 1.5px solid #ddeadd; box-shadow: var(--card-shadow);
+      margin-bottom: 14px; overflow: hidden;
+    }
+    .result-card-header {
+      background: var(--green-bg); padding: 12px 18px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    }
+    .result-produk { font-size: 13px; font-weight: 800; color: var(--green-dark); }
+    .result-timestamp { font-size: 10.5px; color: var(--text-muted); font-weight: 500; }
+    .status-badge {
+      display: inline-block; padding: 4px 12px;
+      border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: .3px;
+    }
+    .status-baru    { background: #e3f2fd; color: #1565c0; }
+    .status-proses  { background: #fff8e1; color: #e65100; }
+    .status-siap    { background: #e8f5e9; color: #1b5e20; }
+    .status-selesai { background: #f3e5f5; color: #6a1b9a; }
+    .status-batal   { background: #ffebee; color: #b71c1c; }
+    .status-lain    { background: #f5f5f5; color: #555; }
+    .result-body {
+      padding: 16px 18px; display: grid;
+      grid-template-columns: 1fr 1fr; gap: 12px 20px;
+    }
+    .result-field { display: flex; flex-direction: column; gap: 2px; }
+    .result-field.full { grid-column: 1 / -1; }
+    .rf-label {
+      font-size: 9.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted);
+    }
+    .rf-value { font-size: 13px; font-weight: 600; color: var(--text-dark); line-height: 1.4; }
+    .result-footer {
+      padding: 12px 18px; border-top: 1.5px solid #edf5ed;
+      display: flex; justify-content: flex-end;
+    }
+    .btn-slip {
+      background: var(--green-mid); color: white;
+      border: none; padding: 9px 18px; border-radius: 8px;
+      font-weight: 700; font-size: 12px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 7px;
+      text-decoration: none; transition: background .2s;
+    }
+    .btn-slip:hover { background: var(--green-dark); }
+    .btn-slip-na { font-size: 11.5px; color: var(--text-muted); font-style: italic; }
+
+    .loading-spinner {
+      text-align: center; padding: 28px;
+      color: var(--text-muted); font-size: 13px;
+    }
+    .spinner {
+      display: inline-block; width: 28px; height: 28px;
+      border: 3px solid #c8e6c9; border-top-color: var(--green-mid);
+      border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer {
+      text-align: center; margin-top: 44px;
+      font-size: 11px; color: #888; line-height: 1.7;
+    }
+    .footer img { width: 72px; margin-bottom: 8px; opacity: .85; mix-blend-mode: multiply; }
+
+    @media (max-width: 480px) {
+      .grid-container, .maklum-grid { grid-template-columns: 1fr; }
+      .info-bar { grid-template-columns: 1fr 1fr; }
+      .result-body { grid-template-columns: 1fr; }
+      .input-row { flex-direction: column; }
+      .nav-bar { justify-content: center; }
+    }
+    @media (max-width: 360px) {
+      .info-bar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="pageUtama" class="page active">
+
+    <div class="header">
+      <div class="logo-box">
+        <img src="https://i.ibb.co/v4GN4rzh/1-Jata-KPKM.png" alt="Logo ITU">
+        <img src="https://i.ibb.co/mrfML35c/2-Logo-DVS.png" alt="Logo JPV">
+        <img src="https://i.ibb.co/205x9dk4/3-Logo-TVET-Malaysia.png" alt="Logo JPV">
+      </div>
+      <h1>SISTEM TEMPAHAN PRODUK UNGGAS (S.T.P.U)</h1>
+      <h2>Institut Teknologi Unggas, Jabatan Perkhidmatan Veterinar</h2>
+    </div>
+
+    <div class="notice">
+      ⚠️ <strong>PERINGATAN:</strong> Pihak kami <strong>TIDAK menerima sebarang bayaran</strong> sebelum terima tempahan. Bayaran hendaklah dibuat ketika mengambil pesanan. &nbsp;|&nbsp;
+      Kami <strong>TIDAK melantik mana-mana agen atau orang tengah</strong>. &nbsp;|&nbsp;
+      Sila berurusan terus dengan kami di <strong>Institut Teknologi Unggas</strong>.
+    </div>
+
+    <div class="nav-bar">
+      <button class="btn-nav active" onclick="showPage('utama')">
+        <i class="fas fa-th-large"></i> Senarai Produk
+      </button>
+      <button class="btn-nav btn-nav-outline" onclick="showPage('semakan')">
+        <i class="fas fa-search"></i> Semak Status Tempahan
+      </button>
+      <button class="btn-nav btn-maklum" onclick="showPage('maklumbalas')">
+        <i class="fas fa-star"></i> Maklumbalas Tempahan
+      </button>
+    </div>
+
+    <div class="info-bar">
+      <div class="info-tile">
+        <div class="tile-icon green"><i class="fas fa-clock"></i></div>
+        <div class="tile-body">
+          <div class="tile-label">Waktu Operasi</div>
+          <div class="tile-value">
+            Isnin – Jumaat · 8:00am – 4:30pm<br>
+            <span style="font-size:11px;font-weight:500;color:var(--text-muted);">Tarikh &amp; masa ambil akan dimaklumkan oleh pegawai</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-tile">
+        <div class="tile-icon map"><i class="fas fa-map-marker-alt"></i></div>
+        <div class="tile-body">
+          <div class="tile-label">Lokasi Pungutan</div>
+          <div class="tile-value">
+            Institut Teknologi Unggas<br>Masjid Tanah, Melaka<br>
+            <a href="https://maps.app.goo.gl/FNMtEZ4jbq6rXnFp6" target="_blank"><i class="fas fa-directions"></i> Buka Google Maps</a>
+          </div>
+        </div>
+      </div>
+      <div class="info-tile">
+        <div class="tile-icon wa"><i class="fab fa-whatsapp"></i></div>
+        <div class="tile-body">
+          <div class="tile-label">Hubungi Kami</div>
+          <div class="tile-value">
+            <a href="https://tempahprodukitu.wasap.my" target="_blank" style="color:var(--wa-green);">
+              <i class="fab fa-whatsapp"></i> WhatsApp Admin
+            </a><br>
+            <span style="font-size:11px;font-weight:500;color:var(--text-muted);">Sebarang pertanyaan tempahan</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-tile">
+        <div class="tile-icon gold"><i class="fas fa-truck"></i></div>
+        <div class="tile-body">
+          <div class="tile-label">Penghantaran</div>
+          <div class="tile-value">
+            Tiada penghantaran disediakan<br>
+            <span style="font-size:11px;font-weight:500;color:var(--text-muted);">Pembeli perlu menguruskan pengangkutan sendiri</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">🐣 Senarai Produk</div>
+    <div class="grid-container">
+
+      <div class="card" onclick="bukaTempahan('ANAK PUYUH PEDAGING (IKTA)','RM1.00 / ekor','Min. 100 ekor','https://docs.google.com/forms/d/1mvbz9cqV1OO1fyajFHdf2V6NI9m93cTd7ZeFB7ew7x4/viewform')">
+        <div class="card-top">
+          <div class="icon-circle"><i class="fas fa-kiwi-bird"></i></div>
+          <div class="card-title-wrap">
+            <div class="card-category">Puyuh · Pedaging</div>
+            <h3>ANAK PUYUH PEDAGING (IKTA)</h3>
+          </div>
+        </div>
+        <div class="card-info-strip">
+          <div class="strip-item"><div class="strip-label">Harga Rujukan</div><div class="strip-value">RM1.00</div><div class="strip-unit">/ ekor</div></div>
+          <div class="strip-item"><div class="strip-label">Min. Tempahan</div><div class="strip-value">100</div><div class="strip-unit">ekor</div></div>
+        </div>
+        <div class="card-bottom"><div class="btn-action"><i class="fas fa-clipboard-list"></i> Buat Tempahan</div></div>
+      </div>
+
+      <div class="card" onclick="bukaTempahan('TELUR BERNAS PUYUH PEDAGING (IKTA)','RM0.40 / biji','Min. 1,000 biji','https://docs.google.com/forms/d/1pT7vRZjWDOHqr1HcbZSaQMkw3biXhg2sC0WN4uh-cSc/viewform')">
+        <div class="card-top">
+          <div class="icon-circle"><i class="fas fa-egg"></i></div>
+          <div class="card-title-wrap">
+            <div class="card-category">Puyuh · Pedaging</div>
+            <h3>TELUR BERNAS PUYUH PEDAGING (IKTA)</h3>
+          </div>
+        </div>
+        <div class="card-info-strip">
+          <div class="strip-item"><div class="strip-label">Harga Rujukan</div><div class="strip-value">RM0.40</div><div class="strip-unit">/ biji</div></div>
+          <div class="strip-item"><div class="strip-label">Min. Tempahan</div><div class="strip-value">1,000</div><div class="strip-unit">biji</div></div>
+        </div>
+        <div class="card-bottom"><div class="btn-action"><i class="fas fa-clipboard-list"></i> Buat Tempahan</div></div>
+      </div>
+
+      <div class="card" onclick="bukaTempahan('ANAK PUYUH PENELUR','RM0.40 / ekor','Min. 100 ekor','https://docs.google.com/forms/d/1kPIy4vITB8hCB-Dfn1H_QUGWldskS-NiRsxeP8RlW1Q/viewform')">
+        <div class="card-top">
+          <div class="icon-circle"><i class="fas fa-kiwi-bird"></i></div>
+          <div class="card-title-wrap">
+            <div class="card-category">Puyuh · Penelur</div>
+            <h3>ANAK PUYUH PENELUR</h3>
+          </div>
+        </div>
+        <div class="card-info-strip">
+          <div class="strip-item"><div class="strip-label">Harga Rujukan</div><div class="strip-value">RM0.40</div><div class="strip-unit">/ ekor</div></div>
+          <div class="strip-item"><div class="strip-label">Min. Tempahan</div><div class="strip-value">100</div><div class="strip-unit">ekor</div></div>
+        </div>
+        <div class="card-bottom"><div class="btn-action"><i class="fas fa-clipboard-list"></i> Buat Tempahan</div></div>
+      </div>
+
+      <div class="card" onclick="bukaTempahan('TELUR BERNAS PUYUH PENELUR','RM0.30 / biji','Min. 1,000 biji','https://docs.google.com/forms/d/1O70wDZ_DblNDigtGVDgkKeG_0npNZAr-lnZUq02Llgw/viewform')">
+        <div class="card-top">
+          <div class="icon-circle"><i class="fas fa-egg"></i></div>
+          <div class="card-title-wrap">
+            <div class="card-category">Puyuh · Penelur</div>
+            <h3>TELUR BERNAS PUYUH PENELUR</h3>
+          </div>
+        </div>
+        <div class="card-info-strip">
+          <div class="strip-item"><div class="strip-label">Harga Rujukan</div><div class="strip-value">RM0.30</div><div class="strip-unit">/ biji</div></div>
+          <div class="strip-item"><div class="strip-label">Min. Tempahan</div><div class="strip-value">1,000</div><div class="strip-unit">biji</div></div>
+        </div>
+        <div class="card-bottom"><div class="btn-action"><i class="fas fa-clipboard-list"></i> Buat Tempahan</div></div>
+      </div>
+
+      <div class="card" onclick="bukaTempahan('ANAK AYAM KAMPUNG','RM1.50 / ekor','Min. 50 ekor','https://docs.google.com/forms/d/1qIINxxD4q-kUKEA2kWIsYcVeWzxWHZ4Z-E3BFH9nAMY/viewform')">
+        <div class="card-top">
+          <div class="icon-circle"><i class="fas fa-dove"></i></div>
+          <div class="card-title-wrap">
+            <div class="card-category">Ayam Kampung</div>
+            <h3>ANAK AYAM KAMPUNG</h3>
+          </div>
+        </div>
+        <div class="card-info-strip">
+          <div class="strip-item"><div class="strip-label">Harga Rujukan</div><div class="strip-value">RM1.50</div><div class="strip-unit">/ ekor</div></div>
+          <div class="strip-item"><div class="strip-label">Min. Tempahan</div><div class="strip-value">50</div><div class="strip-unit">ekor</div></div>
+        </div>
+        <div class="card-bottom"><div class="btn-action"><i class="fas fa-clipboard-list"></i> Buat Tempahan</div></div>
+      </div>
+
+      <div class="card" onclick="bukaTempahan('TELUR BERNAS AYAM KAMPUNG','RM0.50 / biji','Min. 200 biji','https://docs.google.com/forms/d/1zHTy52HjEX-ghfpLKu78iFxL-GZ6II6U7OOAGUPNLfs/viewform')">
+        <div class="card-top">
+          <div class="icon-circle"><i class="fas fa-egg"></i></div>
+          <div class="card-title-wrap">
+            <div class="card-category">Ayam Kampung</div>
+            <h3>TELUR BERNAS AYAM KAMPUNG</h3>
+          </div>
+        </div>
+        <div class="card-info-strip">
+          <div class="strip-item"><div class="strip-label">Harga Rujukan</div><div class="strip-value">RM0.50</div><div class="strip-unit">/ biji</div></div>
+          <div class="strip-item"><div class="strip-label">Min. Tempahan</div><div class="strip-value">200</div><div class="strip-unit">biji</div></div>
+        </div>
+        <div class="card-bottom"><div class="btn-action"><i class="fas fa-clipboard-list"></i> Buat Tempahan</div></div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="pageSemakan" class="page">
+    <div class="semakan-wrap">
+      <div class="page-header">
+        <button class="btn-back" onclick="showPage('utama')"><i class="fas fa-arrow-left"></i> Kembali</button>
+        <div class="page-heading">🔍 Semakan Status Tempahan</div>
+      </div>
+      <div class="semakan-form-card">
+        <p>Masukkan <strong>Nombor Kad Pengenalan (IC)</strong> anda untuk menyemak status tempahan. Carian akan dibuat merentasi semua produk.</p>
+        <div class="input-row">
+          <input class="input-ic" type="text" id="inputIC" placeholder="Contoh: 000000-00-0000" maxlength="14"
+            oninput="formatIC(this)" onkeydown="if(event.key==='Enter') cariTempahan()">
+          <button class="btn-cari" id="btnCari" onclick="cariTempahan()">
+            <i class="fas fa-search"></i> Cari
+          </button>
+        </div>
+      </div>
+      <div id="semakResult"></div>
+    </div>
+  </div>
+
+
+  <div id="pageMaklumbalas" class="page">
+    <div class="page-header" style="max-width:1140px;margin:0 auto 20px;">
+      <button class="btn-back" onclick="showPage('utama')"><i class="fas fa-arrow-left"></i> Kembali</button>
+      <div class="page-heading">⭐ Maklumbalas Prestasi Tempahan</div>
+    </div>
+
+    <div style="max-width:1140px;margin:0 auto 18px;">
+      <div style="background:#f3e5f5;border:1.5px solid #ce93d8;border-radius:10px;padding:12px 16px;font-size:12px;color:#4a148c;line-height:1.7;">
+        💬 <strong>Pendapat anda sangat bermakna kepada kami!</strong> Sila luangkan masa untuk mengisi borang maklumbalas bagi membantu kami meningkatkan kualiti perkhidmatan tempahan di masa akan datang.
+      </div>
+    </div>
+
+    <div class="maklum-grid">
+
+      <a class="maklum-card" href="https://docs.google.com/forms/d/e/1FAIpQLSeP3Mm1mUZ2t5tYZaWCHwsJesPG0lRA_o0-oEvxpcl-Dv_4PA/viewform" target="_blank">
+        <div class="maklum-card-top">
+          <div class="maklum-icon"><i class="fas fa-egg"></i></div>
+          <div class="maklum-title-wrap">
+            <div class="maklum-category">Maklumbalas Prestasi</div>
+            <h3>TELUR BERNAS</h3>
+          </div>
+        </div>
+        <div class="maklum-card-desc">
+          Kongsikan pengalaman anda mengenai kualiti, kesegaran dan perkhidmatan bagi produk <strong>Telur Bernas</strong> yang ditempah.
+        </div>
+        <div class="maklum-card-bottom">
+          <div class="btn-maklum-action"><i class="fas fa-star"></i> Isi Borang Maklumbalas</div>
+        </div>
+      </a>
+
+      <a class="maklum-card" href="https://docs.google.com/forms/d/e/1FAIpQLSdlHEHDBYHI2IzkjyDMTTMQpT48ikmOVZnSB3GDwMrrFQxpew/viewform" target="_blank">
+        <div class="maklum-card-top">
+          <div class="maklum-icon"><i class="fas fa-kiwi-bird"></i></div>
+          <div class="maklum-title-wrap">
+            <div class="maklum-category">Maklumbalas Prestasi</div>
+            <h3>PUYUH</h3>
+          </div>
+        </div>
+        <div class="maklum-card-desc">
+          Kongsikan pengalaman anda mengenai kualiti, kesihatan dan perkhidmatan bagi produk <strong>Puyuh</strong> (anak puyuh / telur puyuh) yang ditempah.
+        </div>
+        <div class="maklum-card-bottom">
+          <div class="btn-maklum-action"><i class="fas fa-star"></i> Isi Borang Maklumbalas</div>
+        </div>
+      </a>
+
+      <a class="maklum-card" href="https://docs.google.com/forms/d/e/1FAIpQLSe6qJb7vXta-qEwRrOZWPlTw6ntvWHMmOf1rXcBw5_pGQJDww/viewform" target="_blank">
+        <div class="maklum-card-top">
+          <div class="maklum-icon"><i class="fas fa-dove"></i></div>
+          <div class="maklum-title-wrap">
+            <div class="maklum-category">Maklumbalas Prestasi</div>
+            <h3>AYAM KAMPUNG</h3>
+          </div>
+        </div>
+        <div class="maklum-card-desc">
+          Kongsikan pengalaman anda mengenai kualiti, kesihatan dan perkhidmatan bagi produk <strong>Ayam Kampung</strong> (anak ayam / telur) yang ditempah.
+        </div>
+        <div class="maklum-card-bottom">
+          <div class="btn-maklum-action"><i class="fas fa-star"></i> Isi Borang Maklumbalas</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="big-icon">📋</div>
+      <h3>Pengesahan Produk</h3>
+      <p>Anda akan dibawa ke borang tempahan untuk:</p>
+      <div class="modal-product" id="modalProductName">—</div>
+      <div class="modal-meta">
+        <div class="modal-meta-item">
+          <div class="mm-label">Harga Rujukan</div>
+          <div class="mm-val" id="modalHarga">—</div>
+        </div>
+        <div class="modal-meta-item">
+          <div class="mm-label">Min. Tempahan</div>
+          <div class="mm-val" id="modalMin">—</div>
+        </div>
+      </div>
+      <div class="email-note">
+        <i class="fas fa-envelope" style="margin-top:2px;flex-shrink:0;"></i>
+        <span>Salinan pengesahan tempahan akan dihantar ke emel anda selepas borang dihantar.</span>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="tutupModal()">✖ Batal</button>
+        <button class="btn-confirm" onclick="teruskan()">
+          <i class="fas fa-external-link-alt"></i> Teruskan ke Borang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <img src="https://i.ibb.co/23Lpw3qY/4-Malaysia-Madani.png" alt="Malaysia Madani"><br>
+    <strong>Copyright &copy; 2026 Institut Teknologi Unggas</strong><br>
+    Jabatan Perkhidmatan Veterinar Malaysia<br>
+    <span style="margin-top:6px;display:inline-block;">
+      <a href="https://tempahprodukitu.wasap.my" target="_blank" style="color:var(--wa-green);font-weight:700;text-decoration:none;">
+        <i class="fab fa-whatsapp"></i> WhatsApp Admin
+      </a>
+    </span>
+  </div>
+
+  <script>
+    const PAGES = ['utama','semakan','maklumbalas'];
+    function showPage(name) {
+      PAGES.forEach(function(p) {
+        document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1)).classList.remove('active');
+      });
+      document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+
+      const btns = document.querySelectorAll('.nav-bar .btn-nav');
+      btns[0].classList.toggle('active', name === 'utama');
+      btns[0].classList.toggle('btn-nav-outline', name !== 'utama');
+      btns[1].classList.toggle('active', name === 'semakan');
+      btns[1].classList.toggle('btn-nav-outline', name !== 'semakan' && name !== 'maklumbalas');
+      btns[2].classList.toggle('active', name === 'maklumbalas');
+
+      if (name === 'semakan') {
+        document.getElementById('semakResult').innerHTML = '';
+        document.getElementById('inputIC').value = '';
+      }
+      window.scrollTo(0, 0);
+    }
+
+    let targetUrl = '';
+    function bukaTempahan(nama, harga, min, url) {
+      targetUrl = url;
+      document.getElementById('modalProductName').textContent = nama;
+      document.getElementById('modalHarga').textContent = harga;
+      document.getElementById('modalMin').textContent = min;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+    function tutupModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      targetUrl = '';
+    }
+    function teruskan() {
+      if (targetUrl) window.open(targetUrl, '_blank');
+      tutupModal();
+    }
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === this) tutupModal();
+    });
+
+    function formatIC(input) {
+      let val = input.value.replace(/\D/g, '');
+      if (val.length > 6) val = val.slice(0,6) + '-' + val.slice(6);
+      if (val.length > 9) val = val.slice(0,9) + '-' + val.slice(9);
+      if (val.length > 14) val = val.slice(0,14);
+      input.value = val;
+    }
+
+    function cariTempahan() {
+      const ic = document.getElementById('inputIC').value.trim();
+      if (!ic || ic.length < 12) { alert('Sila masukkan nombor IC yang lengkap.'); return; }
+      const btn = document.getElementById('btnCari');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mencari...';
+      document.getElementById('semakResult').innerHTML =
+        '<div class="loading-spinner"><div class="spinner"></div><br>Sedang mencari dalam semua rekod tempahan...</div>';
+
+      google.script.run
+        .withSuccessHandler(paparHasil)
+        .withFailureHandler(function() {
+          document.getElementById('semakResult').innerHTML =
+            '<div class="result-empty"><div class="big">⚠️</div>Ralat semasa mencari. Sila cuba lagi.</div>';
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-search"></i> Cari';
+        })
+        .semakTempahan(ic);
+    }
+
+    function statusClass(s) {
+      if (!s) return 'status-lain';
+      s = s.toLowerCase();
+      if (s.includes('baru'))    return 'status-baru';
+      if (s.includes('proses') || s.includes('dalam')) return 'status-proses';
+      if (s.includes('siap'))    return 'status-siap';
+      if (s.includes('selesai')) return 'status-selesai';
+      if (s.includes('batal') || s.includes('ambil')) return 'status-batal';
+      return 'status-lain';
+    }
+
+    function paparHasil(results) {
+      const btn = document.getElementById('btnCari');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-search"></i> Cari';
+      const container = document.getElementById('semakResult');
+
+      if (!results || results.length === 0) {
+        container.innerHTML =
+          '<div class="result-empty"><div class="big">📭</div><strong>Tiada rekod ditemui.</strong><br>Sila pastikan nombor IC anda betul atau hubungi Admin.</div>';
+        return;
+      }
+
+      let html = `<div style="font-size:12.5px;font-weight:600;color:var(--text-muted);margin-bottom:12px;">${results.length} rekod tempahan ditemui</div>`;
+
+      results.forEach(function(r) {
+        const slipHtml = r.slipUrl
+          ? `<a class="btn-slip" href="${r.slipUrl}" target="_blank"><i class="fas fa-file-alt"></i> Lihat Slip Tempahan</a>`
+          : `<span class="btn-slip-na"><i class="fas fa-clock"></i> Slip belum tersedia</span>`;
+
+        html += `
+          <div class="result-card">
+            <div class="result-card-header">
+              <div>
+                <div class="result-produk">${r.produk || '—'}</div>
+                <div class="result-timestamp">${r.timestamp || ''}</div>
+              </div>
+              <span class="status-badge ${statusClass(r.status)}">${r.status || 'Tiada Status'}</span>
+            </div>
+            <div class="result-body">
+              <div class="result-field"><div class="rf-label">Nama</div><div class="rf-value">${r.nama || '—'}</div></div>
+              <div class="result-field"><div class="rf-label">No. Telefon</div><div class="rf-value">${r.tel || '—'}</div></div>
+              <div class="result-field"><div class="rf-label">Email</div><div class="rf-value">${r.email || '—'}</div></div>
+              <div class="result-field"><div class="rf-label">Kuantiti</div><div class="rf-value">${r.kuantiti || '—'}</div></div>
+              <div class="result-field full"><div class="rf-label">Alamat</div><div class="rf-value">${r.alamat || '—'}</div></div>
+              ${r.nota ? `<div class="result-field full"><div class="rf-label">Nota</div><div class="rf-value">${r.nota}</div></div>` : ''}
+            </div>
+            <div class="result-footer">${slipHtml}</div>
+          </div>`;
+      });
+      container.innerHTML = html;
+    }
+  </script>
+
+</body>
+</html>
