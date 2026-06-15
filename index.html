@@ -5,6 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>S.T.P.U - Sistem Tempahan Produk Unggas</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1b5e20">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="S.T.P.U">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -943,6 +950,15 @@
           </div>`;
       });
       container.innerHTML = html;
+    }
+
+    // Daftar service worker untuk keupayaan PWA (install ke skrin utama, akses offline shell).
+    // Hanya jalan bila dilayan dari GitHub Pages (HTTPS) - di Apps Script (/exec)
+    // sw.js tidak wujud dalam sandbox HtmlService, jadi kita 'catch' senyap.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function() {});
+      });
     }
   </script>
 
