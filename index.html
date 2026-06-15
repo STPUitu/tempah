@@ -826,7 +826,19 @@
         document.getElementById('semakResult').innerHTML = '';
         document.getElementById('inputIC').value = '';
       }
-      window.scrollTo(0, 0);
+
+      if (name === 'utama') {
+        // Scroll terus ke Senarai Produk (bukan ke paling atas) supaya
+        // pengguna nampak senarai produk untuk teruskan tempahan.
+        const target = document.querySelector('#pageUtama .section-title');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo(0, 0);
+        }
+      } else {
+        window.scrollTo(0, 0);
+      }
     }
 
     let targetUrl = '';
