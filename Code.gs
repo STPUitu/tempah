@@ -31,7 +31,23 @@ const COL = {
   NOTA      : 8,  // I
 };
 
-function doGet() {
+/**
+ * doGet melayani 2 mod:
+ * 1. Tanpa parameter -> serve halaman web (Index.html) seperti biasa.
+ * 2. ?action=semak&ic=xxxxx -> return JSON hasil semakan (untuk dipanggil
+ *    melalui fetch() dari luar, contoh: GitHub Pages PWA).
+ */
+function doGet(e) {
+  const action = e && e.parameter && e.parameter.action;
+
+  if (action === 'semak') {
+    const ic = (e.parameter.ic || '').toString();
+    const results = semakTempahan(ic);
+    return ContentService
+        .createTextOutput(JSON.stringify({ ok: true, results: results }))
+        .setMimeType(ContentService.MimeType.JSON);
+  }
+
   return HtmlService.createTemplateFromFile('Index')
       .evaluate()
       .setTitle('S.T.P.U - Sistem Tempahan Produk Unggas')

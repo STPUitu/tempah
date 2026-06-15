@@ -850,6 +850,11 @@
       input.value = val;
     }
 
+    // URL deployment Apps Script (Web App /exec) - digunakan sebagai API
+    // bila page ini dilayan dari luar Apps Script (cth GitHub Pages PWA),
+    // sebab 'google.script.run' hanya wujud bila dilayan terus oleh doGet().
+    const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwM6Pt7SJR-_Y_m5vJtgZ_kgqoke5lCh5T4oByrE1lm8fR97pwH4EuRYoejEANd4VNF3g/exec';
+
     function cariTempahan() {
       const ic = document.getElementById('inputIC').value.trim();
       if (!ic || ic.length < 12) { alert('Sila masukkan nombor IC yang lengkap.'); return; }
@@ -859,15 +864,32 @@
       document.getElementById('semakResult').innerHTML =
         '<div class="loading-spinner"><div class="spinner"></div><br>Sedang mencari dalam semua rekod tempahan...</div>';
 
-      google.script.run
-        .withSuccessHandler(paparHasil)
-        .withFailureHandler(function() {
-          document.getElementById('semakResult').innerHTML =
-            '<div class="result-empty"><div class="big">⚠️</div>Ralat semasa mencari. Sila cuba lagi.</div>';
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-search"></i> Cari';
-        })
-        .semakTempahan(ic);
+      function onError() {
+        document.getElementById('semakResult').innerHTML =
+          '<div class="result-empty"><div class="big">⚠️</div>Ralat semasa mencari. Sila cuba lagi.</div>';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-search"></i> Cari';
+      }
+
+      if (window.google && window.google.script && window.google.script.run) {
+        // Dilayan dari Apps Script (/exec) - guna google.script.run
+        google.script.run
+          .withSuccessHandler(paparHasil)
+          .withFailureHandler(onError)
+          .semakTempahan(ic);
+      } else {
+        // Dilayan dari luar (GitHub Pages PWA dsb) - guna fetch ke /exec sebagai API
+        fetch(EXEC_URL + '?action=semak&ic=' + encodeURIComponent(ic))
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data && data.ok) {
+              paparHasil(data.results);
+            } else {
+              onError();
+            }
+          })
+          .catch(onError);
+      }
     }
 
     function statusClass(s) {
