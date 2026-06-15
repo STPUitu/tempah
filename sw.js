@@ -1,7 +1,7 @@
-const CACHE_NAME = 'stpu-cache-v1';
+const CACHE_NAME = 'stpu-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
-  './index.html',
+  './Index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',

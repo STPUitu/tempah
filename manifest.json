@@ -2,7 +2,7 @@
   "name": "S.T.P.U - Sistem Tempahan Produk Unggas",
   "short_name": "S.T.P.U",
   "description": "Sistem Tempahan Produk Unggas - Institut Teknologi Unggas, Jabatan Perkhidmatan Veterinar",
-  "start_url": "./index.html",
+  "start_url": "./Index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#eef2ee",
