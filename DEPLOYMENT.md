@@ -68,6 +68,7 @@ Di bahagian atas `Code.gs` ada beberapa pemalar yang boleh ditala:
 | `CACHE_SECONDS` | `30` | Tempoh cache hasil semakan (saat). `0` = matikan. Naikkan untuk jimat kuota; kurangkan untuk status lebih real-time. |
 | `AUTO_DETECT_COLS` | `true` | Auto-detect lajur Status/Slip ikut header. `false` = guna `statusCol`/`slipCol` tetap. |
 | `IC_LENGTH` | `12` | Panjang IC sah untuk validasi server-side. |
+| `MASK_PII` | `true` | Tapis separa emel/tel/alamat dalam respons API (lindungi PII). `false` = papar penuh. |
 | `PWA_URL` | `stpuitu.github.io/tempah/` | Sasaran redirect bila `/exec` dipanggil tanpa parameter. |
 
 ### Langkah 2: Cipta / Kemaskini Projek Google Apps Script
@@ -127,3 +128,5 @@ Selepas setup awal, untuk membuat perubahan:
 * Jika API sentiasa balas `{ ok: false, error: "IC tidak sah" }`: pastikan IC yang dihantar tepat **12 digit** selepas dibuang aksara bukan nombor. Ini berlaku *by design* — validasi server-side menolak IC kosong/separa.
 * Jika lajur **Status** atau **Slip** kosong sedangkan sheet ada data: jalankan `debugHeaders()` dari editor untuk lihat header sebenar + indeks yang di-resolve. Jika header ambiguous (cth dua lajur mengandungi "STATUS"), set `AUTO_DETECT_COLS = false` dan bergantung pada `statusCol`/`slipCol` yang disahkan manual.
 * Jika perubahan status admin lambat nampak di frontend: ini kesan `CACHE_SECONDS` (default 30 saat). Kurangkan nilai atau set `0` untuk real-time penuh.
+* Jika emel/telefon/alamat nampak "bertopeng" (cth `012••••89`): ini *by design* — `MASK_PII = true`. Set `false` dalam `Code.gs` kalau nak papar butiran penuh kepada pembeli.
+* Jika timeline status tak berubah selepas edit `index.html`: hard-refresh (Ctrl+Shift+R) untuk pintas cache service worker, atau naikkan `CACHE_NAME` dalam `sw.js`.

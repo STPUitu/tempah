@@ -55,6 +55,13 @@ const COL = {
 // Panjang IC Malaysia (selepas buang aksara bukan nombor).
 const IC_LENGTH = 12;
 
+// Mask maklumat peribadi (PII) dalam respons API.
+// Endpoint /exec bersifat awam - kalau true, emel/tel/alamat ditapis separa
+// supaya orang tak boleh brute-force IC untuk kutip data mentah pelanggan.
+// Pemilik tempahan masih boleh cam rekod sendiri (cth "ab****@gmail.com").
+// Set false kalau nak papar butiran penuh kepada pembeli.
+const MASK_PII = true;
+
 // URL PWA untuk redirect.
 const PWA_URL = 'https://stpuitu.github.io/tempah/';
 
@@ -151,10 +158,10 @@ function semakTempahan(ic) {
 
         results.push({
           timestamp : formatTimestamp_(row[COL.TIMESTAMP]),
-          email     : row[COL.EMAIL]    || '',
+          email     : MASK_PII ? maskEmail_(row[COL.EMAIL]) : (row[COL.EMAIL] || ''),
           nama      : row[COL.NAMA]     || '',
-          tel       : row[COL.TEL]      || '',
-          alamat    : row[COL.ALAMAT]   || '',
+          tel       : MASK_PII ? maskTel_(row[COL.TEL])     : (row[COL.TEL]   || ''),
+          alamat    : MASK_PII ? maskAlamat_(row[COL.ALAMAT]) : (row[COL.ALAMAT] || ''),
           produk    : row[COL.PRODUK]   || '',
           kuantiti  : row[COL.KUANTITI] || '',
           nota      : row[COL.NOTA]     || '',
@@ -211,6 +218,42 @@ function formatTimestamp_(val) {
   } catch (e) {
     return String(val); // fallback: papar nilai mentah
   }
+}
+
+/**
+ * Mask emel: tunjuk 2 aksara pertama + domain penuh.
+ * cth "ahmadzaki@gmail.com" -> "ah••••@gmail.com"
+ */
+function maskEmail_(val) {
+  const s = String(val || '').trim();
+  const at = s.indexOf('@');
+  if (at < 1) return s ? '••••' : '';
+  const local  = s.slice(0, at);
+  const domain = s.slice(at); // termasuk '@'
+  const shown  = local.slice(0, Math.min(2, local.length));
+  return shown + '••••' + domain;
+}
+
+/**
+ * Mask nombor telefon: tunjuk 3 digit pertama + 2 digit akhir.
+ * cth "0123456789" -> "012••••89"
+ */
+function maskTel_(val) {
+  const d = String(val || '').replace(/\D/g, '');
+  if (!d) return '';
+  if (d.length <= 5) return d.charAt(0) + '••••';
+  return d.slice(0, 3) + '••••' + d.slice(-2);
+}
+
+/**
+ * Mask alamat: tunjuk ~10 aksara pertama sahaja.
+ * cth "No 12, Jalan Mawar 3, Taman Indah" -> "No 12, Jal…"
+ */
+function maskAlamat_(val) {
+  const s = String(val || '').trim();
+  if (!s) return '';
+  if (s.length <= 10) return s.charAt(0) + '…';
+  return s.slice(0, 10) + '…';
 }
 
 // ============================================================

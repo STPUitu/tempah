@@ -30,6 +30,7 @@ script.google.com/.../exec  (Google Apps Script, API + redirect)
 | `CACHE_SECONDS` | `30` | Tempoh cache hasil semakan (saat). `0` = matikan cache. Naikkan untuk jimat kuota; kurangkan untuk status lebih real-time. |
 | `AUTO_DETECT_COLS` | `true` | Auto-detect lajur Status/Slip ikut nama header. Kalau `false`, guna `statusCol`/`slipCol` tetap sahaja. |
 | `IC_LENGTH` | `12` | Panjang IC sah (selepas buang aksara bukan nombor). |
+| `MASK_PII` | `true` | Tapis separa emel/tel/alamat dalam respons API (lindungi PII daripada brute-force IC). `false` = papar penuh. |
 | `PWA_URL` | `stpuitu.github.io/tempah/` | Sasaran redirect bila `/exec` dipanggil tanpa parameter. |
 
 ---
@@ -191,10 +192,27 @@ const SPREADSHEETS = [
   (atau `AUTO_DETECT_COLS = false`), atau `-1` jika langsung tiada.
 - **`formatTimestamp_(val)`** — format tarikh `dd/MM/yyyy HH:mm` ikut zon skrip; kalau
   nilai tak boleh di-parse, pulangkan nilai mentah sebagai string (tak throw).
+- **`maskEmail_(val)`** — tunjuk 2 aksara pertama + domain penuh (`ah••••@gmail.com`).
+- **`maskTel_(val)`** — tunjuk 3 digit pertama + 2 digit akhir (`012••••89`).
+- **`maskAlamat_(val)`** — tunjuk ~10 aksara pertama sahaja (`No 12, Jal…`).
+
+> Ketiga-tiga fungsi mask hanya digunakan bila `MASK_PII = true`. Ia dipanggil di dalam
+> `results.push(...)` untuk menapis emel/tel/alamat sebelum dipulangkan. Nama & produk
+> tidak di-mask (pemilik perlu cam rekod sendiri; nama sahaja rendah risiko). Endpoint
+> `/exec` bersifat awam, jadi masking mengurangkan pendedahan bila IC di-brute-force.
 
 ---
 
 ## 📱 PWA — `manifest.json` & `sw.js`
+
+### `index.html` — Timeline Status (frontend)
+Fungsi `statusTimeline(status)` di dalam `index.html` membina stepper visual pada
+setiap kad hasil semakan: **Diterima → Diproses → Siap → Selesai**. Peringkat yang
+telah lepas bertanda ✓ (hijau), peringkat semasa ditonjolkan. Status mengandungi
+"batal" → papar notis "Tempahan Dibatalkan" (bukan stepper); status tak dikenali →
+timeline tidak dipapar. Padanan peringkat ikut teks status (`baru`/`proses`/`dalam`/
+`siap`/`selesai`) — sepadan dengan `statusClass()` sedia ada. Ini **frontend sahaja**;
+tiada perubahan backend diperlukan.
 
 ### `manifest.json`
 - `start_url: "./index.html"` — **wajib huruf kecil**, padan dengan fail root GitHub Pages.

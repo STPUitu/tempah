@@ -41,7 +41,7 @@ Google Sheets (6 produk) -> JSON { ok, results: [...] }
 
 | Fail | Fungsi |
 | :--- | :--- |
-| `index.html` | Antara muka pengguna penuh (PWA) — Senarai Produk, Semakan Status, Maklumbalas. Dihoskan di GitHub Pages. |
+| `index.html` | Antara muka pengguna penuh (PWA) — Senarai Produk, Semakan Status (dengan timeline status visual), Maklumbalas. Dihoskan di GitHub Pages. |
 | `manifest.json` | Konfigurasi PWA (nama, ikon, `start_url`, mod `standalone`) untuk "Add to Home Screen". |
 | `sw.js` | Service worker — cache shell statik untuk akses pantas, network-first untuk panggilan API. |
 | `icon-192.png`, `icon-512.png` | Ikon aplikasi S.T.P.U. |
@@ -77,6 +77,7 @@ Endpoint `/exec` bersifat awam, jadi beberapa lapisan perlindungan dibina ke dal
 * **Cache ringkas** — hasil semakan di-cache (`CACHE_SECONDS`, default 30 saat) untuk kurangkan bacaan berulang ke 6 spreadsheet dan jimat kuota.
 * **Auto-detect lajur** — lajur Status/Slip dikesan ikut header (`AUTO_DETECT_COLS`), supaya penambahan lajur pada borang tidak memecahkan pemetaan secara senyap.
 * **Format tarikh selamat** — satu baris timestamp rosak tidak lagi membuang keseluruhan hasil sheet tersebut.
+* **Mask data peribadi (PII)** — bila `MASK_PII = true`, emel/telefon/alamat ditapis separa dalam respons API (cth `ah••••@gmail.com`, `012••••89`) supaya IC tidak boleh di-brute-force untuk kutip data mentah pelanggan. Pemilik tempahan masih boleh cam rekod sendiri.
 
 > 🔧 Jalankan fungsi `debugHeaders()` dari editor Apps Script untuk mengesahkan pemetaan lajur setiap sheet apabila borang berubah.
 

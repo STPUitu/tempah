@@ -452,6 +452,42 @@
     .status-selesai { background: #f3e5f5; color: #6a1b9a; }
     .status-batal   { background: #ffebee; color: #b71c1c; }
     .status-lain    { background: #f5f5f5; color: #555; }
+
+    /* Timeline status (stepper) */
+    .status-timeline {
+      display: flex; padding: 18px 18px 10px;
+      border-bottom: 1.5px solid #edf5ed;
+    }
+    .st-step { flex: 1; position: relative; text-align: center; }
+    .st-step::before {
+      content: ''; position: absolute; top: 11px; left: -50%;
+      width: 100%; height: 3px; background: #dbe7db; z-index: 0;
+    }
+    .st-step:first-child::before { display: none; }
+    .st-step.done::before, .st-step.current::before { background: var(--green-light); }
+    .st-dot {
+      position: relative; z-index: 1;
+      width: 24px; height: 24px; margin: 0 auto 6px;
+      border-radius: 50%; background: #dbe7db; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+    }
+    .st-step.done .st-dot { background: var(--green-light); }
+    .st-step.current .st-dot {
+      background: var(--green-dark);
+      box-shadow: 0 0 0 4px rgba(46,125,50,.15);
+    }
+    .st-label {
+      font-size: 9.5px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .3px;
+    }
+    .st-step.done .st-label, .st-step.current .st-label { color: var(--green-dark); }
+    .status-cancelled {
+      padding: 13px 18px; border-bottom: 1.5px solid #edf5ed;
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12.5px; font-weight: 700; color: var(--red);
+    }
+
     .result-body {
       padding: 16px 18px; display: grid;
       grid-template-columns: 1fr 1fr; gap: 12px 20px;
@@ -922,6 +958,37 @@
       return 'status-lain';
     }
 
+    // Bina timeline visual (stepper) ikut status.
+    // Peringkat: Diterima -> Diproses -> Siap -> Selesai.
+    // Batal -> papar notis; status tak dikenali -> tak papar timeline.
+    function statusTimeline(status) {
+      const s = (status || '').toLowerCase();
+
+      if (s.includes('batal')) {
+        return '<div class="status-cancelled"><i class="fas fa-times-circle"></i> Tempahan Dibatalkan</div>';
+      }
+
+      const steps = ['Diterima', 'Diproses', 'Siap', 'Selesai'];
+      let current = -1;
+      if (s.includes('selesai'))                            current = 3;
+      else if (s.includes('siap'))                          current = 2;
+      else if (s.includes('proses') || s.includes('dalam')) current = 1;
+      else if (s.includes('baru'))                          current = 0;
+
+      if (current === -1) return ''; // status tak dikenali - jangan papar
+
+      let html = '<div class="status-timeline">';
+      steps.forEach(function(label, i) {
+        let cls = '', inner;
+        if (i < current) { cls = 'done'; inner = '<i class="fas fa-check"></i>'; }
+        else if (i === current) { cls = 'current'; inner = '<i class="fas fa-circle" style="font-size:7px;"></i>'; }
+        else { inner = (i + 1); }
+        html += '<div class="st-step ' + cls + '"><div class="st-dot">' + inner + '</div><div class="st-label">' + label + '</div></div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
     function paparHasil(results) {
       const btn = document.getElementById('btnCari');
       btn.disabled = false;
@@ -950,6 +1017,7 @@
               </div>
               <span class="status-badge ${statusClass(r.status)}">${r.status || 'Tiada Status'}</span>
             </div>
+            ${statusTimeline(r.status)}
             <div class="result-body">
               <div class="result-field"><div class="rf-label">Nama</div><div class="rf-value">${r.nama || '—'}</div></div>
               <div class="result-field"><div class="rf-label">No. Telefon</div><div class="rf-value">${r.tel || '—'}</div></div>
