@@ -45,7 +45,7 @@ Google Sheets (6 produk) -> JSON { ok, results: [...] }
 | `manifest.json` | Konfigurasi PWA (nama, ikon, `start_url`, mod `standalone`) untuk "Add to Home Screen". |
 | `sw.js` | Service worker — cache shell statik untuk akses pantas, network-first untuk panggilan API. |
 | `icon-192.png`, `icon-512.png` | Ikon aplikasi S.T.P.U. |
-| `Code.gs` | Backend Google Apps Script — konfigurasi ID Spreadsheet, `doGet` (API + redirect), dan logik carian `semakTempahan`. |
+| `Code.gs` | Backend Google Apps Script — konfigurasi ID Spreadsheet, `doGet`/`handleSemak_` (API + redirect, validasi IC, JSON error handling), carian `semakTempahan` (cache + auto-detect lajur), dan diagnostik `debugHeaders`. |
 | `appsscript.json` | Manifest projek Apps Script (timezone, akses web app). |
 | `.clasp.json` / `.claspignore` | Konfigurasi [clasp](https://github.com/google/clasp) untuk sync `Code.gs` & `appsscript.json` terus ke Apps Script Editor. |
 
@@ -64,7 +64,21 @@ Sistem ini memantau **6 produk utama** yang diuruskan melalui pautan Google Shee
 | 5 | Telur Bernas Puyuh Penelur | Puyuh · Penelur | 1,000 biji | L (12) | N (14) |
 | 6 | Anak Puyuh Penelur | Puyuh · Penelur | 100 ekor | L (12) | O (15) |
 
-> Nota: nombor lajur (M, L, O, N) merujuk lajur sebenar pada setiap helaian Google Sheets, dan boleh berbeza antara produk kerana struktur borang yang sedikit berbeza. Lihat [`TECHNICAL_SPEC.md`](./TECHNICAL_SPEC.md) untuk pemetaan penuh.
+> Nota: nombor lajur (M, L, O, N) merujuk lajur sebenar pada setiap helaian Google Sheets, dan boleh berbeza antara produk kerana struktur borang yang sedikit berbeza. Sejak versi terkini, lajur Status/Slip **dikesan automatik ikut nama header** (`AUTO_DETECT_COLS`), dengan nombor lajur di atas sebagai fallback. Lihat [`TECHNICAL_SPEC.md`](./TECHNICAL_SPEC.md) untuk pemetaan penuh.
+
+---
+
+## 🛡️ Ciri Kestabilan & Keselamatan API
+
+Endpoint `/exec` bersifat awam, jadi beberapa lapisan perlindungan dibina ke dalam `Code.gs`:
+
+* **Validasi IC server-side** — permintaan `?action=semak` hanya diproses jika IC tepat 12 digit. IC kosong/separa ditolak (`{ ok: false, error: "IC tidak sah" }`), mengelakkan pendedahan data pelanggan secara tidak sengaja.
+* **Respons JSON konsisten** — semua ralat dibalut dan dipulangkan sebagai JSON (`{ ok: false, ... }`), jadi frontend tidak pernah menerima halaman ralat HTML yang memecahkan `res.json()`.
+* **Cache ringkas** — hasil semakan di-cache (`CACHE_SECONDS`, default 30 saat) untuk kurangkan bacaan berulang ke 6 spreadsheet dan jimat kuota.
+* **Auto-detect lajur** — lajur Status/Slip dikesan ikut header (`AUTO_DETECT_COLS`), supaya penambahan lajur pada borang tidak memecahkan pemetaan secara senyap.
+* **Format tarikh selamat** — satu baris timestamp rosak tidak lagi membuang keseluruhan hasil sheet tersebut.
+
+> 🔧 Jalankan fungsi `debugHeaders()` dari editor Apps Script untuk mengesahkan pemetaan lajur setiap sheet apabila borang berubah.
 
 ---
 

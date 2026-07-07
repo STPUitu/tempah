@@ -57,6 +57,18 @@ Selepas dilawat melalui HTTPS, pelawat boleh "Add to Home Screen" / "Install" da
    * Kolum H: Kuantiti (`7`)
    * Kolum I: Nota (`8`)
 4. Kemas kini senarai `SPREADSHEETS` dalam `Code.gs` dengan ID sebenar serta `statusCol`/`slipCol` (nombor lajur 1-based, cth Kolum M = 13) bagi setiap produk.
+   * ℹ️ Dengan `AUTO_DETECT_COLS = true` (default), lajur Status/Slip **dikesan automatik ikut nama header** ("STATUS TEMPAHAN" / "SLIP TEMPAHAN" / "MERGED DOC"); `statusCol`/`slipCol` bertindak sebagai fallback sahaja. Jalankan `debugHeaders()` dari editor untuk sahkan pemetaan.
+
+### Pemalar konfigurasi dalam `Code.gs`
+
+Di bahagian atas `Code.gs` ada beberapa pemalar yang boleh ditala:
+
+| Pemalar | Default | Fungsi |
+| :--- | :---: | :--- |
+| `CACHE_SECONDS` | `30` | Tempoh cache hasil semakan (saat). `0` = matikan. Naikkan untuk jimat kuota; kurangkan untuk status lebih real-time. |
+| `AUTO_DETECT_COLS` | `true` | Auto-detect lajur Status/Slip ikut header. `false` = guna `statusCol`/`slipCol` tetap. |
+| `IC_LENGTH` | `12` | Panjang IC sah untuk validasi server-side. |
+| `PWA_URL` | `stpuitu.github.io/tempah/` | Sasaran redirect bila `/exec` dipanggil tanpa parameter. |
 
 ### Langkah 2: Cipta / Kemaskini Projek Google Apps Script
 
@@ -112,3 +124,6 @@ Selepas setup awal, untuk membuat perubahan:
 * Pastikan akaun pelaksana aplikasi mempunyai hak akses "Editor" atau "Viewer" pada kesemua 6 fail spreadsheet produk.
 * Jika `stpuitu.github.io/tempah` menunjukkan **404**: sahkan fail `index.html` (huruf kecil) wujud di root repo dan GitHub Pages telah selesai rebuild.
 * Jika "Semak Status Tempahan" menunjukkan "Ralat semasa mencari": sahkan `EXEC_URL` dalam `index.html` betul dan deployment Apps Script telah di-**Deploy → New version** selepas sebarang perubahan `Code.gs`.
+* Jika API sentiasa balas `{ ok: false, error: "IC tidak sah" }`: pastikan IC yang dihantar tepat **12 digit** selepas dibuang aksara bukan nombor. Ini berlaku *by design* — validasi server-side menolak IC kosong/separa.
+* Jika lajur **Status** atau **Slip** kosong sedangkan sheet ada data: jalankan `debugHeaders()` dari editor untuk lihat header sebenar + indeks yang di-resolve. Jika header ambiguous (cth dua lajur mengandungi "STATUS"), set `AUTO_DETECT_COLS = false` dan bergantung pada `statusCol`/`slipCol` yang disahkan manual.
+* Jika perubahan status admin lambat nampak di frontend: ini kesan `CACHE_SECONDS` (default 30 saat). Kurangkan nilai atau set `0` untuk real-time penuh.

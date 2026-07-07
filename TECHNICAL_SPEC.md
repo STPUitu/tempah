@@ -14,13 +14,23 @@ stpuitu.github.io/tempah/   (GitHub Pages, PWA)
   icon-192.png / icon-512.png
 
 script.google.com/.../exec  (Google Apps Script, API + redirect)
-  Code.gs         - doGet(e), semakTempahan(ic)
+  Code.gs         - doGet(e), handleSemak_(e), semakTempahan(ic),
+                    resolveColIndex_(), formatTimestamp_(), debugHeaders()
   appsscript.json - manifest projek (timezone, webapp access)
 ```
 
 `index.html` adalah **satu-satunya** sumber UI. Apps Script `/exec` **tidak lagi** menyajikan HTML penuh — ia hanya:
 1. `?action=semak&ic=xxxxx` → JSON API
 2. Tanpa parameter → redirect ke GitHub Pages
+
+### Konfigurasi (pemalar di atas `Code.gs`)
+
+| Pemalar | Default | Fungsi |
+| :--- | :---: | :--- |
+| `CACHE_SECONDS` | `30` | Tempoh cache hasil semakan (saat). `0` = matikan cache. Naikkan untuk jimat kuota; kurangkan untuk status lebih real-time. |
+| `AUTO_DETECT_COLS` | `true` | Auto-detect lajur Status/Slip ikut nama header. Kalau `false`, guna `statusCol`/`slipCol` tetap sahaja. |
+| `IC_LENGTH` | `12` | Panjang IC sah (selepas buang aksara bukan nombor). |
+| `PWA_URL` | `stpuitu.github.io/tempah/` | Sasaran redirect bila `/exec` dipanggil tanpa parameter. |
 
 ---
 
@@ -45,28 +55,41 @@ if (window.google && window.google.script && window.google.script.run) {
 
 ---
 
-## 📡 `doGet(e)` — Apps Script API
+## 📡 `doGet(e)` / `handleSemak_(e)` — Apps Script API
+
+`doGet` hanya rute; logik semakan diasingkan ke `handleSemak_` yang **sentiasa
+pulangkan JSON** (walau ralat) supaya `res.json()` di frontend tak pecah.
 
 ```javascript
 function doGet(e) {
   const action = e && e.parameter && e.parameter.action;
-
-  if (action === 'semak') {
-    const ic = (e.parameter.ic || '').toString();
-    const results = semakTempahan(ic);
-    return ContentService
-        .createTextOutput(JSON.stringify({ ok: true, results: results }))
-        .setMimeType(ContentService.MimeType.JSON);
-  }
+  if (action === 'semak') return handleSemak_(e);
 
   return HtmlService.createHtmlOutput(
-      '<script>window.top.location.href="https://stpuitu.github.io/tempah/";</script>' +
-      '<p>Mengalihkan ke <a href="https://stpuitu.github.io/tempah/">https://stpuitu.github.io/tempah/</a>...</p>'
+      '<script>window.top.location.href="' + PWA_URL + '";</script>' +
+      '<p>Mengalihkan ke <a href="' + PWA_URL + '">' + PWA_URL + '</a>...</p>'
   );
+}
+
+function handleSemak_(e) {
+  try {
+    const icRaw = ((e.parameter && e.parameter.ic) || '').toString().replace(/\D/g, '');
+
+    // Validasi server-side: IC mesti tepat 12 digit.
+    // Tanpa ini, ?ic= kosong akan padan baris IC kosong -> dump data.
+    if (icRaw.length !== IC_LENGTH) {
+      return jsonOutput_({ ok: false, error: 'IC tidak sah', results: [] });
+    }
+
+    return jsonOutput_({ ok: true, results: semakTempahan(icRaw) });
+  } catch (err) {
+    Logger.log('handleSemak_ error: ' + err);
+    return jsonOutput_({ ok: false, error: 'ralat pelayan', results: [] });
+  }
 }
 ```
 
-**Respons JSON** (`?action=semak&ic=xxxxx`):
+**Respons JSON — berjaya** (`?action=semak&ic=xxxxxxxxxxxx`):
 ```json
 {
   "ok": true,
@@ -86,6 +109,14 @@ function doGet(e) {
   ]
 }
 ```
+
+**Respons JSON — ralat / IC tak sah** (IC bukan 12 digit, atau ralat pelayan):
+```json
+{ "ok": false, "error": "IC tidak sah", "results": [] }
+```
+
+> Frontend patut semak `data.ok` dahulu, dan hanya panggil `paparHasil(data.results)`
+> bila `ok === true`. Bila `ok === false`, papar mesej ralat/tiada rekod.
 
 ---
 
@@ -110,6 +141,12 @@ const COL = {
 
 `statusCol` dan `slipCol` merujuk lajur "STATUS TEMPAHAN" dan "Merged Doc URL - SLIP TEMPAHAN ..." pada setiap helaian — **nombor lajur sebenar (1-based: A=1, B=2, ...)**, ditukar ke 0-based (`-1`) di dalam `semakTempahan()`.
 
+> ℹ️ **Sejak penambahbaikan kestabilan:** bila `AUTO_DETECT_COLS = true`, indeks lajur
+> Status/Slip ditentukan secara automatik ikut **nama header** (`resolveColIndex_`) —
+> `statusCol`/`slipCol` di bawah kini bertindak sebagai **fallback** sahaja bila header
+> padanan tak dijumpai. Ini melindungi sistem bila borang tambah lajur baru (offset
+> berubah tanpa perlu edit kod). Jalankan `debugHeaders()` untuk sahkan padanan.
+
 ```javascript
 const SPREADSHEETS = [
   { id: "131xIA9dGUmNc6CrWN-4R7N6t4f-bZQ9jSwx0pdzjMHg", statusCol: 13, slipCol: 15 }, // TELUR_BERNAS_AK       -> Status=M(13), Slip URL=O(15)
@@ -127,14 +164,33 @@ const SPREADSHEETS = [
 
 ## 🔍 `semakTempahan(ic)` — Logik Carian
 
-1. Buang semua aksara bukan nombor dari IC input (`ic.replace(/\D/g, '')`).
-2. Untuk setiap entri dalam `SPREADSHEETS`:
+1. Buang aksara bukan nombor dari IC (`ic.replace(/\D/g, '')`).
+2. **Guard IC:** jika bukan tepat `IC_LENGTH` (12) digit, terus pulangkan `[]` —
+   elak IC kosong/separa padan baris IC kosong (lapisan pertahanan kedua selepas
+   validasi di `handleSemak_`).
+3. **Cache:** jika `CACHE_SECONDS > 0`, semak `CacheService` (kunci `ic_<12digit>`).
+   Kalau ada, pulangkan terus tanpa baca sheet.
+4. Untuk setiap entri dalam `SPREADSHEETS`:
    - Buka spreadsheet (`SpreadsheetApp.openById`), ambil sheet pertama (`getSheets()[0]`).
-   - Baca semua data (`getDataRange().getValues()`), skip baris header.
-   - Padankan lajur IC (`COL.IC`) dengan IC input (selepas dibuang aksara bukan nombor).
-   - Jika padan, push objek hasil (lihat struktur JSON di atas) ke `results`.
-   - Ralat akses sheet (cth permission) di-`catch` dan log — sheet tersebut dilangkau, tidak menggagalkan keseluruhan carian.
-3. Pulangkan `results` (array, boleh kosong jika tiada padanan).
+   - Baca semua data (`getDataRange().getValues()`); langkau jika hanya ada header/kosong.
+   - Tentukan `statusIdx`/`slipIdx` guna `resolveColIndex_(headers, ...)` — auto-detect
+     ikut header, fallback ke `statusCol`/`slipCol`.
+   - Padankan lajur IC (`COL.IC`) dengan IC input.
+   - Jika padan, push objek hasil ke `results`. `timestamp` diformat melalui
+     `formatTimestamp_()` yang dibalut `try/catch` — satu tarikh rosak **tidak lagi**
+     membuang keseluruhan hasil sheet (sebelum ni `catch` per-sheet buang semua).
+   - Ralat akses sheet (cth permission) di-`catch` dan log — sheet dilangkau, tidak
+     menggagalkan carian penuh.
+5. Simpan `results` ke cache (jika diaktifkan), kemudian pulangkan (array, boleh kosong).
+
+### Helper berkaitan
+
+- **`resolveColIndex_(headers, candidates, fallbackCol)`** — cari indeks lajur (0-based)
+  ikut senarai substring header (contoh `['STATUS TEMPAHAN']`, `['SLIP TEMPAHAN', 'MERGED DOC']`)
+  mengikut keutamaan. Padanan case-insensitive. Kembali `fallbackCol - 1` jika tak jumpa
+  (atau `AUTO_DETECT_COLS = false`), atau `-1` jika langsung tiada.
+- **`formatTimestamp_(val)`** — format tarikh `dd/MM/yyyy HH:mm` ikut zon skrip; kalau
+  nilai tak boleh di-parse, pulangkan nilai mentah sebagai string (tak throw).
 
 ---
 
@@ -163,6 +219,22 @@ const SPREADSHEETS = [
 clasp push --force   # hantar Code.gs + appsscript.json ke Apps Script Editor
 ```
 Selepas `clasp push`, kod di Apps Script Editor terkini — tetapi **deployment `/exec` tidak auto-update**. Perlu **Deploy → Manage deployments → Edit → New version → Deploy** secara manual untuk kod baru berkuat kuasa di `/exec`.
+
+---
+
+## 🩺 Diagnostik — `debugHeaders()`
+
+Fungsi bantuan untuk penyelenggaraan. Jalankan **manual** dari editor Apps Script
+(pilih `debugHeaders` → **Run** → lihat **Executions / Logs**). Ia log:
+
+- Nama setiap spreadsheet + senarai header (dengan indeks 0-based).
+- `statusIdx` / `slipIdx` yang di-*resolve* (auto-detect atau fallback).
+
+Guna ini untuk **sahkan pemetaan lajur** setiap kali borang berubah, atau bila
+memutuskan sama ada nak kekalkan `AUTO_DETECT_COLS = true`. Jika mana-mana sheet
+ada header ambiguous (cth dua lajur mengandungi "STATUS"), semak output — jika
+auto-detect tersalah pilih, set `AUTO_DETECT_COLS = false` dan bergantung pada
+`statusCol`/`slipCol` yang disahkan manual.
 
 ---
 
