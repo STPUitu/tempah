@@ -25,7 +25,7 @@ const CACHE_SECONDS = 30;
 // Auto-detect lajur Status/Slip ikut nama header dalam sheet.
 // Kalau header dijumpai, ia mengatasi statusCol/slipCol di bawah (lebih tahan
 // bila borang tambah lajur baru). Kalau tak jumpa, fallback ke nombor lajur tetap.
-const AUTO_DETECT_COLS = true;
+const AUTO_DETECT_COLS = false;
 
 // Konfigurasi semua spreadsheet produk.
 // statusCol/slipCol ialah nombor lajur 1-based (A=1, B=2, ...) - digunakan
